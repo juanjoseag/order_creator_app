@@ -7,9 +7,9 @@ bp = Blueprint("product", __name__)
 @bp.route("/")
 def index():
     reference = request.args.get("reference")
-    if reference:
+    if reference is not None:
         product = Product.query.filter(Product.reference.like(f"%{reference}%")).first()
-        if product:
+        if product is not None:
             return redirect(url_for("product.product", product_id=product.id))
 
     flash("No se ha encontrado un producto")

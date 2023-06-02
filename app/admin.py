@@ -1,4 +1,4 @@
-from flask import Markup, request, session, url_for
+from flask import Markup, g, request, session, url_for
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_wtf.file import FileField
@@ -8,7 +8,7 @@ from app.models import Category, Product, Specification, Image
 
 class AdminModelView(ModelView):
     def is_accessible(self):
-        return session.get("is_admin", default=False)
+        return g.is_admin
 
 
 class CategoryView(AdminModelView):
@@ -20,7 +20,10 @@ class CategoryView(AdminModelView):
     column_hide_backrefs = False
     column_searchable_list = ["name"]
     column_list = ("name", "products")
-    column_labels = {"name": "Nombre", "products": "Productos"}
+    column_labels = {
+        "name": "Nombre",
+        "products": "Productos",
+    }
     column_formatters = {"products": _list_products}
 
 
@@ -51,6 +54,7 @@ class ProductView(AdminModelView):
         "retail_price": "Precio al por menor",
         "wholesale_price": "Precio al por mayor",
         "specifications": "Especificaciones",
+        "category": "Categoría",
         "images": "Imágenes",
     }
     column_formatters = {"specifications": _list_specifications, "images": _list_images}
@@ -61,6 +65,7 @@ class SpecificationView(AdminModelView):
         return model.product.reference
 
     column_hide_backrefs = False
+    form_excluded_columns = ["order_entries"]
     column_searchable_list = ["product.reference"]
     column_list = ("size", "color", "quantity", "product")
     column_labels = {
@@ -68,6 +73,7 @@ class SpecificationView(AdminModelView):
         "color": "Color",
         "quantity": "Cantidad",
         "product": "Producto",
+        "product.reference": "Referencia",
     }
     column_formatters = {
         "product": _list_product,
@@ -78,8 +84,11 @@ class ImageView(AdminModelView):
     def on_model_change(self, form, model, is_created):
         image_file = request.files["image"]
         if image_file is not None:
-            model.image = image_file.read()
-            model.mimetype = image_file.mimetype
+            if image_file.content_length < 10 * 1024 * 1024:
+                model.image = image_file.read()
+                model.mimetype = image_file.mimetype
+            else:
+                raise ValueError("El tamaño del archivo excede el límite.")
 
     def _list_image(view, context, model, name):
         if not model.image or not model.mimetype:
@@ -88,11 +97,17 @@ class ImageView(AdminModelView):
             f'<img src="{url_for("image.image", image_id=model.id)}" style="max-width: 300px">'
         )
 
-    form_extra_fields = {"image": FileField("Image")}
+    form_extra_fields = {"image": FileField("Imagen")}
 
     column_searchable_list = ["id", "product.reference"]
     column_list = ("id", "image", "mimetype", "main")
-    column_labels = {"image": "Imagen", "main": "Principal"}
+    column_labels = {
+        "id": "Identificación",
+        "image": "Imagen",
+        "main": "Principal",
+        "product": "Producto",
+        "product.reference": "Referencia",
+    }
     column_formatters = {"image": _list_image}
 
 

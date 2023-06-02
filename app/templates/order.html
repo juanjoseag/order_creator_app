@@ -4,7 +4,7 @@
 Órden
 {% endblock %}
 
-{% block style %}
+{% block head %}
 <style>
     @media print {
         body {
@@ -119,8 +119,8 @@
                             <td>{{ e.specification.size }} - {{ e.specification.color }}</td>
                             <form action="{{ url_for('order.order', order_id=order.id) }}" method="POST">
                                 <input type="hidden" name="id" value="{{ e.id }}">
-                                <td><input type="number" value="{{ e.price }}" min="1" name="price"></td>
-                                <td><input type="number" value="{{ e.quantity }}" min="1" name="quantity"></td>
+                                <td><input type="number" value="{{ e.price }}" min="1" name="price" onchange="this.classList.add('bg-secondary')"></td>
+                                <td><input type="number" value="{{ e.quantity }}" min="1" name="quantity" onchange="this.classList.add('bg-secondary')"></td>
                                 <td>{{ "{:,}".format(e.price * e.quantity) }}</td>
                                 <td><button type="submit" class="btn btn-danger d-print-none" name="_method"
                                         value="DELETE">Borrar</button></td>
