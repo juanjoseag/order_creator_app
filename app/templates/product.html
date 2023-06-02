@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Producto
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for i in product.images %}
+                    <div class="carousel-item {% if loop.index0 == 0 %} active {% endif %}">
+                        <img src="{{ url_for('image.image', image_id=i.id) }}" class="d-block w-100" alt="Product">
+                        <div class="carousel-caption">
+                            <a href="{{ url_for('image.image', image_id=i.id) }}" class="d-block" download>Descargar</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                    data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                </button>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <h1>{{ product.reference }}</h1>
+            <p class="text-muted">{{ product.description }}</p>
+            <form action="{{ url_for('order.order', order_selector='active') }}" method="POST">
+                <div class="form-group mt-2">
+                    <label for="specification">Especificación</label>
+                    <select id="specification" class="form-select" aria-label="Seleccionar especificación"
+                        name="specification" required>
+                        {% for s in product.specifications %}
+                        <option value="{{ s.id }}">
+                            {{ s.size }} - {{ s.color }}
+
+                            {% if s.quantity < 0 %}
+                                (disponible)
+                                {% elif s.quantity==0 %}
+                                (no disponible)
+                                {% else %}
+                                ({{ s.quantity }} unidades disponibles)
+                                {% endif %}
+                                </option>
+                                {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="quantity">Cantidad</label>
+                    <input type="number" id="quantity" class="form-control" value="1" min="1" name="quantity" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="price">Precio</label>
+                    <select id="price" class="form-select" aria-label="Select price" name="price" required>
+                        <option value="{{ product.retail_price }}">{{ "{:,}".format(product.retail_price) }} (precio al
+                            por menor)</option>
+                        <option value="{{ product.wholesale_price }}">{{ "{:,}".format(product.wholesale_price) }}
+                            (precio al por mayor)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info mt-2" name="_method" value="POST">Añadir producto</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

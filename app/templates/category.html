@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+Categoría
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2">
+            <ul class="list-group list-group-flush">
+                {% for c in categories %}
+                <a class="list-group-item list-group-item-action {% if c.id == category.id %} active {% endif %}"
+                    href="{{ url_for('category.category', category_id=c.id) }}">{{ c.name }}</a>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-sm-10">
+            <div class="container-fluid">
+                <div class="row">
+                    {% for p in products %}
+                    {% for i in p.main_images %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <img class="card-img-top" src="{{ url_for('image.image', image_id=i.id) }}" alt="Producto">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ p.reference }}</h5>
+                                <p class="card-text">{{ category.name }} - {{ p.description }}</p>
+                                <a href="{{ url_for('product.product', product_id=p.id) }}" class="btn btn-info">Añadir
+                                    producto</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 mt-2">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not products.has_prev %} disable {% endif %}">
+                        <a class="page-link"
+                            href="{{ url_for('category.category', category_id=category.id, page=products.prev_num) }}">Anterior</a>
+                    </li>
+                    <li class="page-item {% if not products.has_next %} disable {% endif %}">
+                        <a class="page-link"
+                            href="{{ url_for('category.category', category_id=category.id, page=products.next_num) }}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}

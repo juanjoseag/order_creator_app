@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+Iniciar sesión
+{% endblock %}
+
+{% block body %}
+<form action="/login" method="POST">
+    <div class="form-group mt-2">
+        <label for="username">Nombre de usuario</label>
+        <input id="username" class="form-control" name="username" placeholder="Nombre de usuario" required>
+    </div>
+    <div class="form-group mt-2">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" class="form-control" name="password" placeholder="Contraseña" required>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Iniciar sesión</button>
+</form>
+{% endblock %}

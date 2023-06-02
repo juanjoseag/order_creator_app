@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}
+Órden
+{% endblock %}
+
+{% block style %}
+<style>
+    @media print {
+        body {
+            width: 1400px;
+        }
+
+        button {
+            display: none !important;
+        }
+
+        input,
+        textarea {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background-color: inherit !important;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2 d-print-none">
+            <form action="{{ url_for('order.index') }}" method="POST">
+                <div class="form-group mt-2">
+                    <label for="name" class="form-label">Nombre</label>
+                    <input class="form-control" id="name" name="name" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="personId" class="form-label">Documento de identidad</label>
+                    <input class="form-control" id="personId" name="personId" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="address" class="form-label">Dirección</label>
+                    <input class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="city" class="form-label">Ciudad</label>
+                    <input class="form-control" id="city" name="city" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="phone" class="form-label">Celular</label>
+                    <input class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <button type="submit" class="btn btn-info mt-2" name="_method" value="POST">Añadir orden</button>
+            </form>
+            <hr class="hr">
+            {% for o in orders %}
+            <div class="card {% if order and o.id == order.id %} border-primary {% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ o.name }}</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{ o.person_id }}</li>
+                    <li class="list-group-item">{{ o.address }}</li>
+                    <li class="list-group-item">{{ o.city }}</li>
+                    <li class="list-group-item">{{ o.phone }}</li>
+                    <li class="list-group-item">{{ o.email }}</li>
+                </ul>
+                <div class="card-body">
+                    <form action="{{ url_for('order.index') }}" method="POST">
+                        <input type="hidden" name="id" value="{{ o.id }}">
+                        <button type="submit" class="btn btn-danger" name="_method" value="DELETE">Borrar</button>
+                    </form>
+                    <a class="btn btn-info mt-2" href="{{ url_for('order.order', order_id=o.id) }}"
+                        role="button">Editar</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-sm-10">
+            {% if order %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Referencia</th>
+                            <th scope="col">Descripccíon</th>
+                            <th scope="col">Especificación</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Parcial</th>
+                            <th colspan="2" class="d-print-none"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in order.order_entries %}
+                        <tr>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td><img src="{{ url_for('image.image', image_id=e.image.id) }}" style="max-width: 300px">
+                            </td>
+                            <td>{{ e.product.reference }}</td>
+                            <td>{{ e.product.description }}</td>
+                            <td>{{ e.specification.size }} - {{ e.specification.color }}</td>
+                            <form action="{{ url_for('order.order', order_id=order.id) }}" method="POST">
+                                <input type="hidden" name="id" value="{{ e.id }}">
+                                <td><input type="number" value="{{ e.price }}" min="1" name="price"></td>
+                                <td><input type="number" value="{{ e.quantity }}" min="1" name="quantity"></td>
+                                <td>{{ "{:,}".format(e.price * e.quantity) }}</td>
+                                <td><button type="submit" class="btn btn-danger d-print-none" name="_method"
+                                        value="DELETE">Borrar</button></td>
+                                <td><button type="submit" class="btn btn-info d-print-none" name="_method"
+                                        value="PUT">Editar</button></td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6"><button class="btn btn-info d-print-none" onclick="window.print()">Exportar
+                                    como PDF</button></td>
+                            <th>Total</th>
+                            <td>{{ "{:,}".format(order.total) }}</td>
+                            <th colspan="2" class="d-print-none"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+            <h1 class="text-center">Edita o añade una orden</h1>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

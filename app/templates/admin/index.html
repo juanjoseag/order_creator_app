@@ -1,0 +1,16 @@
+{% extends "admin/master.html" %}
+
+{% block body %}
+<a href="{{ url_for(" general.index") }}">Página principal</a>
+<h1>Estructura</h1>
+<ul>
+    <li>Todo producto está relacionado a una categoría</li>
+    <li>Toda especificación está relacionada con un producto</li>
+    <li>Todo imagen está relacionada a un producto y se puede marcar como principal</li>
+</ul>
+<h1>Recomendaciones</h1>
+<ul>
+    <li>Es preferible cambiar las cantidades de un producto a cero que borrarlo</li>
+    <li>Es preferible cambiar la cantidad de una especificación a cero que borrarla</li>
+</ul>
+{% endblock %}
